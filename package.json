@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "start": "elm-live src/Main.elm --dir=./public --hot --start-page=public/index.html -- --output=public/app.js --debug"
+  },
+  "dependencies": {
+    "elm-live": "^4.0.2"
+  }
+}
