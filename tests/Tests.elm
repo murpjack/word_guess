@@ -1,7 +1,10 @@
 module Tests exposing (..)
 
 import Expect
+import Main exposing (game, maxGuesses)
 import Test exposing (..)
+import Test.Html.Query as Query
+import Test.Html.Selector exposing (disabled, tag)
 import Types exposing (Ptn(..))
 import Utils exposing (match)
 
@@ -38,11 +41,38 @@ all =
                 in
                 Expect.all
                     [ \_ ->
-                        Expect.equal (matchWith guess1) expect1
+                        Expect.equalLists (matchWith guess1) expect1
                     , \_ ->
-                        Expect.equal (matchWith guess2) expect2
+                        Expect.equalLists (matchWith guess2) expect2
                     , \_ ->
-                        Expect.equal (matchWith guess3) expect3
+                        Expect.equalLists (matchWith guess3) expect3
                     ]
                     ()
+        , test "#9 Game over if max guesses reached" <|
+            \_ ->
+                let
+                    maxGuesses =
+                        5
+
+                    guesses =
+                        [ "abcde", "abcde", "abcde", "abcde", "abcde" ]
+
+                    inputState =
+                        { value = "noway"
+                        , disabled = List.length guesses == maxGuesses
+                        }
+                in
+                Expect.all
+                    [ \el ->
+                        el
+                            |> Query.fromHtml
+                            |> Query.children [ tag "input" ]
+                            |> Query.each (Query.has [ disabled True ])
+                    , \el ->
+                        el
+                            |> Query.fromHtml
+                            |> Query.children [ tag "button" ]
+                            |> Query.each (Query.has [ disabled True ])
+                    ]
+                    (game inputState)
         ]

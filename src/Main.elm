@@ -168,9 +168,9 @@ type alias InputState =
 
 game : InputState -> Html Msg
 game s =
-    Html.div []
+    Html.div [ Attrs.class "game" ]
         [ Html.input [ Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
-        , Html.button [ Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
+        , Html.button [ Attrs.disabled s.disabled, Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
         ]
 
 
