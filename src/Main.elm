@@ -7,7 +7,7 @@ import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
-import Tuple
+import Triple
 
 
 words : List String
@@ -45,34 +45,44 @@ type Ptn a
     | Absent a
 
 
-match : List Char -> List Char -> List (Ptn Char)
-match wd guess =
-    Tuple.first <| List.foldr look ( [], List.reverse wd ) guess
+match : String -> List (Ptn Char)
+match guess =
+    let
+        guessC =
+            String.toList guess
 
+        answerC =
+            String.toList answer
+    in
+    -- TODO: ?? Possible performance improvement around reversing str
+    List.reverse <|
+        Triple.first <|
+            List.foldl
+                (\c ( ls, wd, ans ) ->
+                    if List.isEmpty wd || List.isEmpty ans then
+                        ( ls, [], [] )
 
-look : Char -> ( List (Ptn Char), List Char ) -> ( List (Ptn Char), List Char )
-look c ( ls, wd ) =
-    if List.isEmpty wd then
-        ( ls, [] )
+                    else
+                        let
+                            ( w, ws ) =
+                                List.splitAt 1 wd
+                        in
+                        case List.head w of
+                            Just i ->
+                                if i == c then
+                                    ( Exact c :: ls, ws, List.remove c ans )
 
-    else
-        let
-            ( w, ws ) =
-                List.splitAt 1 wd
-        in
-        case List.head w of
-            Just i ->
-                if i == c then
-                    ( Exact c :: ls, ws )
+                                else if List.member c ans then
+                                    ( Present c :: ls, ws, List.remove c ans )
 
-                else if List.member c ws then
-                    ( Present c :: ls, ws )
+                                else
+                                    ( Absent c :: ls, ws, ans )
 
-                else
-                    ( Absent c :: ls, ws )
-
-            Nothing ->
-                ( ls, wd )
+                            Nothing ->
+                                ( ls, wd, ans )
+                )
+                ( [], answerC, answerC )
+                guessC
 
 
 renderGuess : List (Ptn a) -> List (Html Msg)
@@ -80,8 +90,6 @@ renderGuess =
     List.map
         (\ptn ->
             case ptn of
-                --       _ ->
-                --           Html.text "a"
                 Exact c ->
                     Html.span [ Attrs.style "color" "green" ] [ Html.text (toString c) ]
 
@@ -124,9 +132,10 @@ update msg model =
             -- FIXME: Refactor me to use a random word from a long list
             case List.head words of
                 Just w ->
-                    if model.currentGuess /= w && List.length model.guesses - 1 == maxGuesses then
+                    if model.currentGuess /= w && List.length model.guesses == maxGuesses - 1 then
                         ( { model
                             | message = "too bad. try again tomorrow"
+                            , guesses = model.currentGuess :: model.guesses
                             , played = w :: model.played
                             , winStreakCurrent = 0
                           }
@@ -196,7 +205,10 @@ view model =
         [ Html.div [ Attrs.id "app" ]
             [ Html.text (toString model)
             , Html.div [] (List.map previousGuess model.guesses)
-            , game model
+            , game
+                { value = model.currentGuess
+                , disabled = List.length model.guesses >= maxGuesses
+                }
             , details model
             , Html.text model.message
             ]
@@ -206,23 +218,22 @@ view model =
 
 previousGuess : String -> Html Msg
 previousGuess guess =
-    let
-        g =
-            String.toList guess
-
-        w =
-            String.toList answer
-    in
     Html.div []
-        (match w g
+        (match guess
             |> renderGuess
         )
 
 
-game : Model -> Html Msg
-game m =
+type alias InputState =
+    { disabled : Bool
+    , value : String
+    }
+
+
+game : InputState -> Html Msg
+game s =
     Html.div []
-        [ Html.input [ Attrs.value m.currentGuess, Attrs.onInput TypeLetter ] []
+        [ Html.input [ Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
         , Html.button [ Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
         ]
 
