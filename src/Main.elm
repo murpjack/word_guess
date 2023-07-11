@@ -7,7 +7,8 @@ import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
-import Triple
+import Types exposing (Model, Msg(..), Ptn(..))
+import Utils exposing (match)
 
 
 words : List String
@@ -18,71 +19,6 @@ words =
 answer : String
 answer =
     "water"
-
-
-type Msg
-    = SubmitGuess
-    | TypeLetter String
-
-
-type alias Model =
-    { currentGuess : String
-    , guesses : List String
-    , played : List String
-    , won : Int
-    , message : String
-
-    -- history detail pt games finished on each guess
-    , history : List Int
-    , winStreakCurrent : Int
-    , winStreakBest : Int
-    }
-
-
-type Ptn a
-    = Exact a
-    | Present a
-    | Absent a
-
-
-match : String -> List (Ptn Char)
-match guess =
-    let
-        guessC =
-            String.toList guess
-
-        answerC =
-            String.toList answer
-    in
-    -- TODO: ?? Possible performance improvement around reversing str
-    List.reverse <|
-        Triple.first <|
-            List.foldl
-                (\c ( ls, wd, ans ) ->
-                    if List.isEmpty wd || List.isEmpty ans then
-                        ( ls, [], [] )
-
-                    else
-                        let
-                            ( w, ws ) =
-                                List.splitAt 1 wd
-                        in
-                        case List.head w of
-                            Just i ->
-                                if i == c then
-                                    ( Exact c :: ls, ws, List.remove c ans )
-
-                                else if List.member c ans then
-                                    ( Present c :: ls, ws, List.remove c ans )
-
-                                else
-                                    ( Absent c :: ls, ws, ans )
-
-                            Nothing ->
-                                ( ls, wd, ans )
-                )
-                ( [], answerC, answerC )
-                guessC
 
 
 renderGuess : List (Ptn a) -> List (Html Msg)
@@ -219,7 +155,7 @@ view model =
 previousGuess : String -> Html Msg
 previousGuess guess =
     Html.div []
-        (match guess
+        (match answer guess
             |> renderGuess
         )
 
