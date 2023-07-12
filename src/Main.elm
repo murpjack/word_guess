@@ -13,12 +13,12 @@ import Utils exposing (match)
 
 words : List String
 words =
-    [ "water" ]
+    [ "WATER" ]
 
 
 answer : String
 answer =
-    "water"
+    "WATER"
 
 
 maxGuesses : Int
@@ -64,7 +64,7 @@ update msg model =
                         , Cmd.none
                         )
 
-                    else if model.currentGuess == w then
+                    else if model.currentGuess == String.toUpper w then
                         ( { model
                             | message = "yay"
                             , guesses = model.guesses ++ [ model.currentGuess ]
@@ -98,9 +98,14 @@ update msg model =
                     , Cmd.none
                     )
 
-        TypeLetter g ->
+        TypeLetter inputStr ->
             ( { model
-                | currentGuess = g
+                | currentGuess =
+                    if List.all Char.isAlpha <| String.toList inputStr then
+                        String.toUpper inputStr
+
+                    else
+                        model.currentGuess
               }
             , Cmd.none
             )
