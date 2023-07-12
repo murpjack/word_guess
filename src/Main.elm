@@ -164,8 +164,8 @@ body m =
 attempt : InputState -> Html Msg
 attempt s =
     Html.div [ Attrs.class "attempt" ]
-        [ Html.input [ Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
-        , Html.button [ Attrs.disabled s.disabled, Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
+        [ Html.input [ Attrs.maxlength 5, Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
+        , Html.button [ Attrs.disabled (s.disabled || String.length s.value < 5), Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
         ]
 
 
