@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <title>My Elm app</title>
     <link href="./styles.css" rel="stylesheet" />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-2PKB1H43WE"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-2PKB1H43WE");
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -15,4 +29,3 @@
     </script>
   </body>
 </html>
-
