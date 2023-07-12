@@ -1,7 +1,7 @@
 module Tests exposing (..)
 
 import Expect
-import Main exposing (game, maxGuesses)
+import Main exposing (attempt, maxGuesses)
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (disabled, tag)
@@ -74,5 +74,5 @@ all =
                             |> Query.children [ tag "button" ]
                             |> Query.each (Query.has [ disabled True ])
                     ]
-                    (game inputState)
+                    (attempt inputState)
         ]
