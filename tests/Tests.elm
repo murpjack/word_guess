@@ -7,6 +7,7 @@ import Test.Html.Query as Query
 import Test.Html.Selector exposing (disabled, tag)
 import Types exposing (Ptn(..))
 import Utils exposing (match)
+import Words exposing (words)
 
 
 all : Test
@@ -75,4 +76,16 @@ all =
                             |> Query.each (Query.has [ disabled True ])
                     ]
                     (attempt inputState)
+        , test "#10 Add a list of words" <|
+            \_ ->
+                Expect.all
+                    [ \wds -> Expect.greaterThan 0 (List.length wds)
+                    , \wds ->
+                        let
+                            wordsAreAll5LettersLong =
+                                List.all ((==) 5 << String.length) wds
+                        in
+                        Expect.equal True wordsAreAll5LettersLong
+                    ]
+                    words
         ]

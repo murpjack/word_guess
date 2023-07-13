@@ -8,6 +8,7 @@ type Msg
 
 type alias Model =
     { currentGuess : String
+    , answer : Maybe String
     , guesses : List String
     , played : List String
     , won : Int

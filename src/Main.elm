@@ -2,23 +2,16 @@ module Main exposing (..)
 
 import Browser
 import Debug exposing (toString)
+import Flags
 import Html exposing (Html)
 import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
+import Maybe.Extra as Maybe
 import Types exposing (Model, Msg(..), Ptn(..))
 import Utils exposing (match)
-
-
-words : List String
-words =
-    [ "WATER" ]
-
-
-answer : String
-answer =
-    "WATER"
+import Words exposing (words)
 
 
 maxGuesses : Int
@@ -27,8 +20,16 @@ maxGuesses =
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
-init _ =
+init flags =
+    let
+        f =
+            Decode.decodeValue Flags.decode flags |> Result.withDefault Flags.default
+    in
     ( { currentGuess = ""
+      , answer =
+            Maybe.andThen
+                (\randomidx -> List.getAt randomidx words)
+                f.random
       , guesses = []
       , played = []
       , won = 0
@@ -50,27 +51,27 @@ update msg model =
     case msg of
         SubmitGuess ->
             -- FIXME: Refactor me to use a random word from a long list
-            case List.head words of
-                Just w ->
-                    if model.currentGuess /= w && List.length model.guesses + 1 == maxGuesses then
+            case model.answer of
+                Just ans ->
+                    if model.currentGuess /= ans && List.length model.guesses + 1 == maxGuesses then
                         ( { model
                             | message =
-                                "The correct answer is " ++ answer ++ ". Try again tomorrow"
+                                "The correct answer is " ++ ans ++ ". Try again tomorrow"
                             , guesses = model.guesses ++ [ model.currentGuess ]
                             , currentGuess = ""
-                            , played = w :: model.played
+                            , played = ans :: model.played
                             , winStreakCurrent = 0
                           }
                         , Cmd.none
                         )
 
-                    else if model.currentGuess == String.toUpper w then
+                    else if model.currentGuess == String.toUpper ans then
                         ( { model
                             | message = "yay"
                             , guesses = model.guesses ++ [ model.currentGuess ]
                             , history = List.updateAt (List.length model.guesses) ((+) 1) model.history
                             , won = model.won + 1
-                            , played = w :: model.played
+                            , played = ans :: model.played
                             , winStreakCurrent = model.winStreakCurrent + 1
                             , winStreakBest =
                                 if model.winStreakCurrent + 1 > model.winStreakBest then
@@ -136,33 +137,40 @@ body : Model -> List (Html Msg)
 body m =
     let
         found =
-            List.member answer m.guesses
+            m.answer
+                |> Maybe.map (\ans -> List.member ans m.guesses)
+                |> Maybe.withDefault False
 
         attempts =
-            List.map
-                (\n ->
-                    case List.getAt n m.guesses of
-                        Just a ->
-                            if a == answer then
-                                (renderGuess << match answer) a
+            case m.answer of
+                Just answer ->
+                    List.map
+                        (\n ->
+                            case List.getAt n m.guesses of
+                                Just a ->
+                                    if a == answer then
+                                        (renderGuess << match answer) a
 
-                            else
-                                (renderGuess << match answer) a
+                                    else
+                                        (renderGuess << match answer) a
 
-                        Nothing ->
-                            if n == List.length m.guesses && not found then
-                                attempt { value = m.currentGuess, disabled = False }
+                                Nothing ->
+                                    if n == List.length m.guesses && not found then
+                                        attempt { value = m.currentGuess, disabled = False }
 
-                            else
-                                Html.div []
-                                    (List.repeat 5 (Html.span [] [ Html.text "_" ]))
-                )
-            <|
-                List.range 0 (maxGuesses - 1)
+                                    else
+                                        Html.div []
+                                            (List.repeat 5 (Html.span [] [ Html.text "_" ]))
+                        )
+                    <|
+                        List.range 0 (maxGuesses - 1)
+
+                Nothing ->
+                    [ Html.text "There is no answer!!?" ]
     in
     [ Html.div [] attempts
     , details m
-    , Html.text m.message
+    , Html.text (m.message ++ toString m.answer)
     ]
 
 
