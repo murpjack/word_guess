@@ -9,9 +9,9 @@ import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
 import Maybe.Extra as Maybe
-import Types exposing (Model, Msg(..), Ptn(..))
+import Types exposing (Model, Msg(..), Ptn(..), Tried(..))
 import Utils exposing (match)
-import Words exposing (words)
+import Words exposing (alphabet, words)
 
 
 maxGuesses : Int
@@ -31,6 +31,7 @@ init flags =
                 (\randomidx -> List.getAt randomidx words)
                 f.random
       , guesses = []
+      , tried = List.map (Tried False) <| String.toList alphabet
       , played = []
       , won = 0
       , message = ""
@@ -50,6 +51,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SubmitGuess ->
+            let
+                inputC =
+                    String.toList model.currentGuess
+            in
             -- FIXME: Refactor me to use a random word from a long list
             case model.answer of
                 Just ans ->
@@ -69,6 +74,29 @@ update msg model =
                         ( { model
                             | message = "yay"
                             , guesses = model.guesses ++ [ model.currentGuess ]
+                            , tried =
+                                if List.all Char.isAlpha inputC then
+                                    List.updateIf
+                                        (\t ->
+                                            case t of
+                                                Tried False c ->
+                                                    List.member c inputC
+
+                                                _ ->
+                                                    False
+                                        )
+                                        (\t ->
+                                            case t of
+                                                Tried False c ->
+                                                    Tried True c
+
+                                                _ ->
+                                                    t
+                                        )
+                                        model.tried
+
+                                else
+                                    model.tried
                             , history = List.updateAt (List.length model.guesses) ((+) 1) model.history
                             , won = model.won + 1
                             , played = ans :: model.played
@@ -87,6 +115,29 @@ update msg model =
                         ( { model
                             | message = ""
                             , currentGuess = ""
+                            , tried =
+                                if List.all Char.isAlpha inputC then
+                                    List.updateIf
+                                        (\t ->
+                                            case t of
+                                                Tried False c ->
+                                                    List.member c inputC
+
+                                                _ ->
+                                                    False
+                                        )
+                                        (\t ->
+                                            case t of
+                                                Tried False c ->
+                                                    Tried True c
+
+                                                _ ->
+                                                    t
+                                        )
+                                        model.tried
+
+                                else
+                                    model.tried
                             , guesses = model.guesses ++ [ model.currentGuess ]
                           }
                         , Cmd.none
@@ -100,9 +151,13 @@ update msg model =
                     )
 
         TypeLetter inputStr ->
+            let
+                inputC =
+                    String.toList inputStr
+            in
             ( { model
                 | currentGuess =
-                    if List.all Char.isAlpha <| String.toList inputStr then
+                    if List.all Char.isAlpha inputC then
                         String.toUpper inputStr
 
                     else
@@ -168,10 +223,18 @@ body m =
                 Nothing ->
                     [ Html.text "There is no answer!!?" ]
     in
-    [ Html.div [] attempts
-    , details m
-    , Html.text (m.message ++ toString m.answer)
+    [ Html.text (m.message ++ toString m.answer)
+    , Html.div [] attempts
+    , viewTried m.currentGuess m.tried
+
+    --    , details m
     ]
+
+
+type alias InputState =
+    { disabled : Bool
+    , value : String
+    }
 
 
 attempt : InputState -> Html Msg
@@ -199,10 +262,19 @@ renderGuess =
             )
 
 
-type alias InputState =
-    { disabled : Bool
-    , value : String
-    }
+viewTried : String -> List Tried -> Html Msg
+viewTried currentGuess ws =
+    Html.div [] <|
+        List.map
+            (\t ->
+                case t of
+                    Tried True c ->
+                        Html.span [ Attrs.disabled True, Attrs.style "background-color" "lightgrey" ] [ Html.text (String.fromChar c) ]
+
+                    Tried False c ->
+                        Html.span [ Attrs.onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
+            )
+            ws
 
 
 details : Model -> Html Msg

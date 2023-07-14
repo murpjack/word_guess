@@ -1,4 +1,4 @@
-module Types exposing (Model, Msg(..), Ptn(..))
+module Types exposing (Model, Msg(..), Ptn(..), Tried(..))
 
 
 type Msg
@@ -10,6 +10,7 @@ type alias Model =
     { currentGuess : String
     , answer : Maybe String
     , guesses : List String
+    , tried : List Tried
     , played : List String
     , won : Int
     , message : String
@@ -25,3 +26,7 @@ type Ptn a
     = Exact a
     | Present a
     | Absent a
+
+
+type Tried
+    = Tried Bool Char

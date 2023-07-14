@@ -1,4 +1,9 @@
-module Words exposing (words)
+module Words exposing (alphabet, words)
+
+
+alphabet : String
+alphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 words : List String
