@@ -8,7 +8,7 @@ import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
-import Maybe.Extra as Maybe
+import Ports as Ports
 import Types exposing (Model, Msg(..), Ptn(..), Tried(..))
 import Utils exposing (match)
 import Words exposing (alphabet, words)
@@ -23,24 +23,61 @@ init : Decode.Value -> ( Model, Cmd Msg )
 init flags =
     let
         f =
-            Decode.decodeValue Flags.decode flags |> Result.withDefault Flags.default
+            Decode.decodeValue Flags.decode flags
+                |> Result.withDefault Flags.default
     in
-    ( { currentGuess = ""
-      , answer =
-            Maybe.andThen
-                (\randomidx -> List.getAt randomidx words)
-                f.random
-      , guesses = []
-      , tried = List.map (Tried False) <| String.toList alphabet
-      , played = []
-      , won = 0
-      , message = ""
-      , history = List.repeat maxGuesses 0
-      , winStreakCurrent = 0
-      , winStreakBest = 0
+    ( { answer =
+            case List.getAt f.idx words of
+                Just a ->
+                    String.toUpper a
+
+                Nothing ->
+                    "ERROR"
+      , currentGuess = ""
+      , guesses = f.guesses
+      , tried = getTriedChars f.guesses
+      , history =
+            case f.history of
+                [] ->
+                    [ 0, 0, 0, 0, 0, 0 ]
+
+                -- head is games not won
+                h ->
+                    h
+      , played = List.foldr (\v acc -> acc + v) 0 f.history
+      , won =
+            case f.history of
+                [] ->
+                    0
+
+                _ :: xs ->
+                    List.foldr (\v acc -> acc + v) 0 xs
+      , winStreakCurrent = f.winStreakCurrent
+      , winStreakBest = f.winStreakBest
       }
     , Cmd.none
     )
+
+
+getTriedChars : List String -> List Tried
+getTriedChars guesses =
+    let
+        gchars : List Char
+        gchars =
+            List.map String.toList guesses
+                |> List.concat
+                |> List.unique
+    in
+    List.foldr
+        (\c acc ->
+            if List.member c gchars then
+                Tried True c :: acc
+
+            else
+                Tried False c :: acc
+        )
+        []
+        (String.toList alphabet)
 
 
 
@@ -51,104 +88,90 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SubmitGuess ->
-            let
-                inputC =
-                    String.toList model.currentGuess
-            in
-            -- FIXME: Refactor me to use a random word from a long list
-            case model.answer of
-                Just ans ->
-                    if model.currentGuess /= ans && List.length model.guesses + 1 == maxGuesses then
-                        ( { model
-                            | message =
-                                "The correct answer is " ++ ans ++ ". Try again tomorrow"
-                            , guesses = model.guesses ++ [ model.currentGuess ]
-                            , currentGuess = ""
-                            , played = ans :: model.played
-                            , winStreakCurrent = 0
-                          }
-                        , Cmd.none
-                        )
+            if model.currentGuess /= model.answer && List.length model.guesses + 1 == maxGuesses then
+                ( { model
+                    | guesses = model.guesses ++ [ model.currentGuess ]
+                    , currentGuess = ""
+                    , played = model.played + 1
+                    , history = List.updateAt 0 ((+) 1) model.history
+                    , winStreakCurrent = 0
+                  }
+                , Ports.sendDataOutside
+                    (Ports.PersistData
+                        { idx =
+                            case List.findIndex ((==) model.answer) words of
+                                Just i ->
+                                    i
 
-                    else if model.currentGuess == String.toUpper ans then
-                        ( { model
-                            | message = "yay"
-                            , guesses = model.guesses ++ [ model.currentGuess ]
-                            , tried =
-                                if List.all Char.isAlpha inputC then
-                                    List.updateIf
-                                        (\t ->
-                                            case t of
-                                                Tried False c ->
-                                                    List.member c inputC
-
-                                                _ ->
-                                                    False
-                                        )
-                                        (\t ->
-                                            case t of
-                                                Tried False c ->
-                                                    Tried True c
-
-                                                _ ->
-                                                    t
-                                        )
-                                        model.tried
-
-                                else
-                                    model.tried
-                            , history = List.updateAt (List.length model.guesses) ((+) 1) model.history
-                            , won = model.won + 1
-                            , played = ans :: model.played
-                            , winStreakCurrent = model.winStreakCurrent + 1
-                            , winStreakBest =
-                                if model.winStreakCurrent + 1 > model.winStreakBest then
-                                    model.winStreakCurrent + 1
-
-                                else
-                                    model.winStreakBest
-                          }
-                        , Cmd.none
-                        )
-
-                    else
-                        ( { model
-                            | message = ""
-                            , currentGuess = ""
-                            , tried =
-                                if List.all Char.isAlpha inputC then
-                                    List.updateIf
-                                        (\t ->
-                                            case t of
-                                                Tried False c ->
-                                                    List.member c inputC
-
-                                                _ ->
-                                                    False
-                                        )
-                                        (\t ->
-                                            case t of
-                                                Tried False c ->
-                                                    Tried True c
-
-                                                _ ->
-                                                    t
-                                        )
-                                        model.tried
-
-                                else
-                                    model.tried
-                            , guesses = model.guesses ++ [ model.currentGuess ]
-                          }
-                        , Cmd.none
-                        )
-
-                Nothing ->
-                    ( { model
-                        | message = "impossible"
-                      }
-                    , Cmd.none
+                                Nothing ->
+                                    0
+                        , guesses = model.guesses ++ [ model.currentGuess ]
+                        , history = List.updateAt 0 ((+) 1) model.history
+                        , winStreakCurrent = 0
+                        , winStreakBest = model.winStreakBest
+                        }
                     )
+                )
+
+            else if model.currentGuess == model.answer then
+                ( { model
+                    | guesses = model.guesses ++ [ model.currentGuess ]
+                    , tried = getTriedChars (model.currentGuess :: model.guesses)
+                    , history = List.updateAt (List.length model.guesses + 1) ((+) 1) model.history
+                    , won = model.won + 1
+                    , played = model.played + 1
+                    , winStreakCurrent = model.winStreakCurrent + 1
+                    , winStreakBest =
+                        if model.winStreakCurrent + 1 > model.winStreakBest then
+                            model.winStreakCurrent + 1
+
+                        else
+                            model.winStreakBest
+                  }
+                , Ports.sendDataOutside
+                    (Ports.PersistData
+                        { idx =
+                            case List.findIndex ((==) model.answer) words of
+                                Just i ->
+                                    i
+
+                                Nothing ->
+                                    0
+                        , guesses = model.guesses ++ [ model.currentGuess ]
+                        , history = List.updateAt (List.length model.guesses + 1) ((+) 1) model.history
+                        , winStreakCurrent = model.winStreakCurrent + 1
+                        , winStreakBest =
+                            if model.winStreakCurrent + 1 > model.winStreakBest then
+                                model.winStreakCurrent + 1
+
+                            else
+                                model.winStreakBest
+                        }
+                    )
+                )
+
+            else
+                ( { model
+                    | currentGuess = ""
+                    , tried = getTriedChars (model.currentGuess :: model.guesses)
+                    , guesses = model.guesses ++ [ model.currentGuess ]
+                  }
+                , Ports.sendDataOutside
+                    (Ports.PersistData
+                        { idx =
+                            case List.findIndex ((==) model.answer) words of
+                                Just i ->
+                                    i
+
+                                Nothing ->
+                                    0
+                        , guesses = model.guesses ++ [ model.currentGuess ]
+                        , history = model.history
+                        , winStreakCurrent = model.winStreakCurrent
+                        , winStreakBest = model.winStreakBest
+                        }
+                    )
+                )
 
         TypeLetter inputStr ->
             let
@@ -192,38 +215,40 @@ body : Model -> List (Html Msg)
 body m =
     let
         found =
-            m.answer
-                |> Maybe.map (\ans -> List.member ans m.guesses)
-                |> Maybe.withDefault False
+            List.member m.answer m.guesses
 
         attempts =
-            case m.answer of
-                Just answer ->
-                    List.map
-                        (\n ->
-                            case List.getAt n m.guesses of
-                                Just a ->
-                                    if a == answer then
-                                        (renderGuess << match answer) a
+            List.map
+                (\n ->
+                    case List.getAt n m.guesses of
+                        Just a ->
+                            if a == m.answer then
+                                (renderGuess << match m.answer) a
 
-                                    else
-                                        (renderGuess << match answer) a
+                            else
+                                (renderGuess << match m.answer) a
 
-                                Nothing ->
-                                    if n == List.length m.guesses && not found then
-                                        attempt { value = m.currentGuess, disabled = False }
+                        Nothing ->
+                            if n == List.length m.guesses && not found then
+                                attempt { value = m.currentGuess, disabled = False }
 
-                                    else
-                                        Html.div []
-                                            (List.repeat 5 (Html.span [] [ Html.text "_" ]))
-                        )
-                    <|
-                        List.range 0 (maxGuesses - 1)
-
-                Nothing ->
-                    [ Html.text "There is no answer!!?" ]
+                            else
+                                Html.div []
+                                    (List.repeat 5 (Html.span [] [ Html.text "_" ]))
+                )
+            <|
+                List.range 0 (maxGuesses - 1)
     in
-    [ Html.text (m.message ++ toString m.answer)
+    [ Html.text
+        (if List.member m.answer m.guesses then
+            "Success!! The answer is " ++ toString m.answer
+
+         else if List.length m.guesses == maxGuesses then
+            "Unsuccessful! The answer is " ++ m.answer
+
+         else
+            ""
+        )
     , Html.div [] attempts
     , viewTried m.currentGuess m.tried
 
@@ -282,6 +307,6 @@ details s =
     Html.div []
         [ Html.div [] [ Html.text ("guesses so far: " ++ (List.length s.guesses |> toString)) ]
         , Html.div [] [ Html.text ("won: " ++ toString s.won) ]
-        , Html.div [] [ Html.text ("played: " ++ (List.length s.played |> toString)) ]
+        , Html.div [] [ Html.text ("played: " ++ (s.played |> toString)) ]
         , Html.div [] [ Html.text ("history: " ++ toString s.history) ]
         ]

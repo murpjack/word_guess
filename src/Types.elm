@@ -1,22 +1,20 @@
 module Types exposing (Model, Msg(..), Ptn(..), Tried(..))
 
-
 type Msg
     = SubmitGuess
     | TypeLetter String
 
 
 type alias Model =
-    { currentGuess : String
-    , answer : Maybe String
+    { answer : String
+    , currentGuess : String
     , guesses : List String
     , tried : List Tried
-    , played : List String
-    , won : Int
-    , message : String
 
     -- history detail pt games finished on each guess
     , history : List Int
+    , played : Int
+    , won : Int
     , winStreakCurrent : Int
     , winStreakBest : Int
     }
