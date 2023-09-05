@@ -41,20 +41,23 @@
       }
 
       const flags = (() => {
-        const d = fromStorage("d");
+        const d = fromStorage("d") || {};
+
         const previous = fromStorage("timestamp");
         const idx =
           dateString(previous) === dateString(t())
-            ? d.idx
+            ? // FIXME: Meaningless defaults
+              d?.idx || Math.floor(Math.random() * 629)
             : Math.floor(Math.random() * 629);
 
         return {
           // FIXME: These defaults are meaningless.
           idx,
-          guesses: d.guesses || [],
-          history: d.history || [],
-          winStreakCurrent: d.winStreakCurrent || 0,
-          winStreakBest: d.winStreakBest || 0,
+          // TODO: These guard cases could be avoided
+          guesses: d?.guesses || [],
+          history: d?.history || [],
+          winStreakCurrent: d?.winStreakCurrent || 0,
+          winStreakBest: d?.winStreakBest || 0,
         };
       })();
 
