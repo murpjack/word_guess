@@ -2,11 +2,11 @@ module Tests exposing (..)
 
 import Expect
 import Main exposing (attempt, maxGuesses)
+import Match exposing (match)
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (disabled, tag)
 import Types exposing (Ptn(..))
-import Utils exposing (match)
 import Words exposing (words)
 
 
@@ -21,6 +21,9 @@ all =
 
                     matchWith =
                         match answer
+
+                    exact =
+                        List.map Exact <| String.toList answer
 
                     guess1 =
                         "wheat"
@@ -39,14 +42,24 @@ all =
 
                     expect3 =
                         [ Exact 'w', Present 'e', Present 'a', Absent 'v', Absent 'e' ]
+
+                    guess4 =
+                        "error"
+
+                    expect4 =
+                        [ Present 'e', Absent 'r', Absent 'r', Absent 'o', Exact 'r' ]
                 in
                 Expect.all
                     [ \_ ->
+                        Expect.equalLists (matchWith answer) exact
+                    , \_ ->
                         Expect.equalLists (matchWith guess1) expect1
                     , \_ ->
                         Expect.equalLists (matchWith guess2) expect2
                     , \_ ->
                         Expect.equalLists (matchWith guess3) expect3
+                    , \_ ->
+                        Expect.equalLists (matchWith guess4) expect4
                     ]
                     ()
         , test "#9 Game over if max guesses reached" <|
