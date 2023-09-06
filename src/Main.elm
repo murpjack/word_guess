@@ -1,16 +1,15 @@
 module Main exposing (..)
 
 import Browser
-import Debug exposing (toString)
 import Flags
 import Html exposing (Html)
 import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
 import List.Extra as List
+import Match exposing (match)
 import Ports as Ports
 import Types exposing (Model, Msg(..), Ptn(..), Tried(..))
-import Utils exposing (match)
 import Words exposing (alphabet, words)
 
 
@@ -241,7 +240,7 @@ body m =
     in
     [ Html.text
         (if List.member m.answer m.guesses then
-            "Success!! The answer is " ++ toString m.answer
+            "Success!! The answer is " ++ m.answer
 
          else if List.length m.guesses == maxGuesses then
             "Unsuccessful! The answer is " ++ m.answer
@@ -252,7 +251,7 @@ body m =
     , Html.div [] attempts
     , viewTried m.currentGuess m.tried
 
-    --    , details m
+    -- , details m
     ]
 
 
@@ -305,8 +304,10 @@ viewTried currentGuess ws =
 details : Model -> Html Msg
 details s =
     Html.div []
-        [ Html.div [] [ Html.text ("guesses so far: " ++ (List.length s.guesses |> toString)) ]
-        , Html.div [] [ Html.text ("won: " ++ toString s.won) ]
-        , Html.div [] [ Html.text ("played: " ++ (s.played |> toString)) ]
-        , Html.div [] [ Html.text ("history: " ++ toString s.history) ]
+        [ Html.div [] [ Html.text ("guesses so far: " ++ (List.length s.guesses |> String.fromInt)) ]
+
+        --  , Html.div [] [ Html.text ("ans: " ++ s.answer) ]
+        , Html.div [] [ Html.text ("won: " ++ String.fromInt s.won) ]
+        , Html.div [] [ Html.text ("played: " ++ (s.played |> String.fromInt)) ]
+        , Html.div [] [ Html.text ("history: " ++ List.foldr ((++) << String.fromInt) "" s.history) ]
         ]
