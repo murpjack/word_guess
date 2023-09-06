@@ -1,6 +1,10 @@
 {
+  "license": "MIT",
+  "main": "dist/index.html",
   "scripts": {
-    "start": "elm-live src/Main.elm --dir=./public --hot --start-page=public/index.html -- --output=public/app.js --debug"
+    "start": "elm-live src/Main.elm --dir=./public --hot --start-page=dist/index.html -- --output=dist/app.js --debug",
+    "build:dev": "rm -rf dist/ | mkdir dist | cp public/index.html dist/ & cp public/styles.css dist/ & elm make src/Main.elm --debug --output=dist/app.js",
+    "build:prod": "rm -rf dist/ | mkdir dist | cp public/index.html dist/ & cp public/styles.css dist/ & elm make src/Main.elm --optimize --output=dist/app.js"
   },
   "dependencies": {
     "elm-live": "^4.0.2",
