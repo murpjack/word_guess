@@ -25,7 +25,6 @@ resource "digitalocean_app" "my-app" {
       github {
         repo = "murpjack/word_guess"
         branch         = "deploy"
-        deploy_on_push = true
       }
     }
   }
