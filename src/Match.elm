@@ -4,6 +4,26 @@ import List.Extra as List
 import Types exposing (Ptn(..))
 
 
+{-|
+
+    Given a pair of equal length strings - in this case answer and guess,
+    indicate how close the guesser's guessed guess was.
+    ie. Mark each letter with a Pattern type and use that type to change the colour of the letter.
+    This will no doubt propell the guesser on to great things.
+
+    Noteworthy, answer and guess is sewn together in a cartesian pair, cart.
+    This means exact pairs are compared without using indexes.
+    Perhaps indexes would make the code more performant? In any case...
+
+    Possible cases here include:
+        - letter in guess is an exact match
+        - letter in guess is not an exact match but is present in another position [1]
+        - letter in guess does not appear in the answer.
+
+    [1] No more than the number of like-letters in answer should change colour in the display.
+        Matches should be coloured from left to right.
+
+-}
 match : String -> String -> List (Ptn Char)
 match answer guess =
     let

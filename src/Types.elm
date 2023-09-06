@@ -1,5 +1,6 @@
 module Types exposing (Model, Msg(..), Ptn(..), Tried(..))
 
+
 type Msg
     = SubmitGuess
     | TypeLetter String
@@ -20,6 +21,9 @@ type alias Model =
     }
 
 
+{-| This Ptn type describes whether a subpattern, Char, found in a pattern, String,
+is an exact match, or whether it exists, or whether it does not exist at all.
+-}
 type Ptn a
     = Exact a
     | Present a
