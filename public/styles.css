@@ -1,3 +1,39 @@
-span {
-  padding-left: 8px;
+.wrapper {
+  margin: 0 auto;
+  max-width: 540px;
+  display: block;
+  text-align: center;
+}
+
+.guesses {
+  padding-top: 5em;
+}
+
+.guess,
+.attempt {
+  display: inline-block;
+  margin-bottom: 4em;
+}
+
+.guess > span.letter {
+  padding: 1em 1.2em;
+  background-color: #eee;
+  border: 0.4em solid #fff;
+  border-radius: 100%;
+  box-sizing: border-box;
+  margin: 1em 0.4em;
+}
+
+.attempt > input {
+  width: 291px;
+  margin-left: 45px;
+}
+
+.guess > span.empty {
+  padding: 1em 1.2em;
+  background-color: #fff;
+  border: 0.4em solid #eee;
+  border-radius: 100%;
+  box-sizing: border-box;
+  margin: 1em 0.4em;
 }

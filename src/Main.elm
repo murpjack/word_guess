@@ -232,24 +232,26 @@ body m =
                                 attempt { value = m.currentGuess, disabled = False }
 
                             else
-                                Html.div []
-                                    (List.repeat 5 (Html.span [] [ Html.text "_" ]))
+                                Html.div [ Attrs.class "guess" ]
+                                    (List.repeat 5 (Html.span [ Attrs.class "empty" ] [ Html.text "_" ]))
                 )
             <|
                 List.range 0 (maxGuesses - 1)
     in
-    [ Html.text
-        (if List.member m.answer m.guesses then
-            "Success!! The answer is " ++ m.answer
+    [ Html.div [ Attrs.class "wrapper" ]
+        [ Html.text
+            (if List.member m.answer m.guesses then
+                "Success!! The answer is " ++ m.answer
 
-         else if List.length m.guesses == maxGuesses then
-            "Unsuccessful! The answer is " ++ m.answer
+             else if List.length m.guesses == maxGuesses then
+                "Unsuccessful! The answer is " ++ m.answer
 
-         else
-            ""
-        )
-    , Html.div [] attempts
-    , viewTried m.currentGuess m.tried
+             else
+                ""
+            )
+        , Html.div [ Attrs.class "guesses" ] attempts
+        , viewTried m.currentGuess m.tried
+        ]
 
     -- , details m
     ]
@@ -271,18 +273,18 @@ attempt s =
 
 renderGuess : List (Ptn Char) -> Html Msg
 renderGuess =
-    Html.div []
+    Html.div [ Attrs.class "guess" ]
         << List.map
             (\ptn ->
                 case ptn of
                     Exact c ->
-                        Html.span [ Attrs.style "color" "green" ] [ Html.text (String.fromChar c) ]
+                        Html.span [ Attrs.class "letter", Attrs.style "background-color" "green" ] [ Html.text (String.fromChar c) ]
 
                     Present c ->
-                        Html.span [ Attrs.style "color" "orangered" ] [ Html.text (String.fromChar c) ]
+                        Html.span [ Attrs.class "letter", Attrs.style "background-color" "orangered" ] [ Html.text (String.fromChar c) ]
 
                     Absent c ->
-                        Html.span [] [ Html.text (String.fromChar c) ]
+                        Html.span [ Attrs.class "letter" ] [ Html.text (String.fromChar c) ]
             )
 
 
