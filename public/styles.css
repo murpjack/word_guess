@@ -15,7 +15,7 @@
   margin-bottom: 4em;
 }
 
-.guess > span.letter {
+span.letter {
   padding: 1em 1.2em;
   background-color: #eee;
   border: 0.4em solid #fff;
@@ -51,11 +51,31 @@
 .tried > span {
   border: 0.12em solid #e5e5e5;
   box-sizing: border-box;
+  cursor: pointer;
   width: 9%;
   height: 2.4em;
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+
+.strikethrough {
+  position: relative;
+}
+.strikethrough:before {
+  position: absolute;
+  content: "";
+  left: 0;
+  top: 50%;
+  right: 0;
+  border-top: 1px solid;
+  border-color: black;
+  transform: rotate(-5deg);
+}
+
+.tried > span.disabled {
+  pointer-events: none;
+  background-color: lightgrey;
 }
 
 .tried > .action {

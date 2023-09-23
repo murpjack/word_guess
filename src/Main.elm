@@ -229,7 +229,7 @@ body m =
 
                         Nothing ->
                             if n == List.length m.guesses && not found then
-                                attempt { value = m.currentGuess, disabled = False }
+                                attempt m.currentGuess
 
                             else
                                 Html.div [ Attrs.class "guess" ]
@@ -257,16 +257,28 @@ body m =
     ]
 
 
-type alias InputState =
-    { disabled : Bool
-    , value : String
-    }
-
-
-attempt : InputState -> Html Msg
-attempt s =
+attempt : String -> Html Msg
+attempt currentGuess =
+    let
+        currentGuessAndBlanks =
+            String.toList currentGuess ++ List.repeat (5 - String.length currentGuess) '_'
+    in
     Html.div [ Attrs.class "attempt" ]
-        [ Html.input [ Attrs.maxlength 5, Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
+        [ Html.input
+            [ Attrs.autofocus True
+            , Attrs.maxlength 5
+            , Attrs.value currentGuess
+            , Attrs.onInput TypeLetter
+            ]
+            []
+        , Html.div
+            []
+            (List.map
+                (\c ->
+                    Html.span [ Attrs.class "letter" ] [ Html.text (String.fromChar c) ]
+                )
+                currentGuessAndBlanks
+            )
         ]
 
 
@@ -303,7 +315,7 @@ viewTried currentGuess ws =
             (\t ->
                 case t of
                     Tried True c ->
-                        Html.span [ Attrs.disabled True, Attrs.style "background-color" "lightgrey" ] [ Html.text (String.fromChar c) ]
+                        Html.span [ Attrs.disabled True, Attrs.class "strikethrough disabled" ] [ Html.text (String.fromChar c) ]
 
                     Tried False c ->
                         Html.span [ Attrs.onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
