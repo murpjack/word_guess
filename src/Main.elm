@@ -267,7 +267,6 @@ attempt : InputState -> Html Msg
 attempt s =
     Html.div [ Attrs.class "attempt" ]
         [ Html.input [ Attrs.maxlength 5, Attrs.value s.value, Attrs.disabled s.disabled, Attrs.onInput TypeLetter ] []
-        , Html.button [ Attrs.disabled (s.disabled || String.length s.value < 5), Attrs.onClick SubmitGuess ] [ Html.text "Enter" ]
         ]
 
 
@@ -290,8 +289,9 @@ renderGuess =
 
 viewTried : String -> List Tried -> Html Msg
 viewTried currentGuess ws =
-    Html.div [] <|
-        List.map
+    Html.div
+        [ Attrs.class "tried" ]
+        (List.map
             (\t ->
                 case t of
                     Tried True c ->
@@ -301,6 +301,15 @@ viewTried currentGuess ws =
                         Html.span [ Attrs.onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
             )
             ws
+            ++ [ Html.span [ Attrs.class "action" ] [ Html.text "Backspace" ]
+               , Html.button
+                    [ Attrs.class "action"
+                    , Attrs.disabled (String.length currentGuess /= 5)
+                    , Attrs.onClick SubmitGuess
+                    ]
+                    [ Html.text "Enter" ]
+               ]
+        )
 
 
 details : Model -> Html Msg
