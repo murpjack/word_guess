@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Flags
-import Html exposing (Html)
+import Html exposing (Attribute, Html)
 import Html.Attributes as Attrs
 import Html.Events as Attrs
 import Json.Decode as Decode
@@ -289,6 +289,14 @@ renderGuess =
 
 viewTried : String -> List Tried -> Html Msg
 viewTried currentGuess ws =
+    let
+        backspace : String -> String
+        backspace g =
+            String.toList g
+                |> List.init
+                |> Maybe.map String.fromList
+                |> Maybe.withDefault g
+    in
     Html.div
         [ Attrs.class "tried" ]
         (List.map
@@ -301,15 +309,32 @@ viewTried currentGuess ws =
                         Html.span [ Attrs.onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
             )
             ws
-            ++ [ Html.span [ Attrs.class "action" ] [ Html.text "Backspace" ]
+            ++ [ Html.button
+                    [ Attrs.class "action"
+                    , Attrs.disabled (String.length currentGuess == 0)
+                    , onClick
+                        (TypeLetter (backspace currentGuess))
+                    ]
+                    [ Html.text "Backspace" ]
                , Html.button
                     [ Attrs.class "action"
                     , Attrs.disabled (String.length currentGuess /= 5)
-                    , Attrs.onClick SubmitGuess
+                    , onClick SubmitGuess
                     ]
                     [ Html.text "Enter" ]
                ]
         )
+
+
+onClick : msg -> Attribute msg
+onClick msg =
+    Attrs.preventDefaultOn "click"
+        (Decode.map alwaysPreventDefault <| Decode.succeed msg)
+
+
+alwaysPreventDefault : msg -> ( msg, Bool )
+alwaysPreventDefault msg =
+    ( msg, True )
 
 
 details : Model -> Html Msg
