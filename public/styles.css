@@ -48,7 +48,7 @@ span.letter {
   margin-top: 4em;
 }
 
-.tried > span {
+.tried > button {
   border: 0.12em solid #e5e5e5;
   box-sizing: border-box;
   cursor: pointer;
@@ -73,7 +73,7 @@ span.letter {
   transform: rotate(-5deg);
 }
 
-.tried > span.disabled {
+.tried > button.disabled {
   pointer-events: none;
   background-color: lightgrey;
 }

@@ -315,10 +315,10 @@ viewTried currentGuess ws =
             (\t ->
                 case t of
                     Tried True c ->
-                        Html.span [ Attrs.disabled True, Attrs.class "strikethrough disabled" ] [ Html.text (String.fromChar c) ]
+                        Html.button [ Attrs.disabled True, Attrs.class "strikethrough disabled" ] [ Html.text (String.fromChar c) ]
 
                     Tried False c ->
-                        Html.span [ Attrs.onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
+                        Html.button [ onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
             )
             ws
             ++ [ Html.button
