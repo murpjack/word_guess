@@ -229,7 +229,7 @@ body m =
 
                         Nothing ->
                             if n == List.length m.guesses && not found then
-                                attempt m.currentGuess
+                                attempt m.currentGuess n
 
                             else
                                 Html.div [ Attrs.class "guess" ]
@@ -259,12 +259,13 @@ body m =
     ]
 
 
-attempt : String -> Html Msg
-attempt currentGuess =
+attempt : String -> Int -> Html Msg
+attempt currentGuess guessN =
     Html.div [ Attrs.class "attempt" ]
         [ Html.input
             [ Attrs.autofocus True
             , Attrs.maxlength 5
+            , Attrs.disabled (guessN >= maxGuesses)
             , Attrs.value currentGuess
             , Attrs.onInput TypeLetter
             ]

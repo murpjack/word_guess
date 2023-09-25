@@ -65,16 +65,11 @@ all =
         , test "#9 Game over if max guesses reached" <|
             \_ ->
                 let
-                    maxGuesses =
-                        5
-
                     guesses =
                         [ "abcde", "abcde", "abcde", "abcde", "abcde" ]
 
                     inputState =
-                        { value = "noway"
-                        , disabled = List.length guesses == maxGuesses
-                        }
+                        "noway"
                 in
                 Expect.all
                     [ \el ->
@@ -88,7 +83,7 @@ all =
                             |> Query.children [ tag "button" ]
                             |> Query.each (Query.has [ disabled True ])
                     ]
-                    (attempt inputState)
+                    (attempt inputState (List.length guesses))
         , test "#10 Add a list of words" <|
             \_ ->
                 Expect.all
