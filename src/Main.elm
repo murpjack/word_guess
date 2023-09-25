@@ -240,16 +240,18 @@ body m =
     in
     [ Html.div [ Attrs.class "wrapper" ]
         [ Html.div [ Attrs.class "guesses" ] attempts
-        , Html.text
-            (if List.member m.answer m.guesses then
-                "Success!! The answer is " ++ m.answer
+        , Html.div [ Attrs.class "messages" ]
+            [ Html.text
+                (if List.member m.answer m.guesses then
+                    "Success!! The answer is " ++ m.answer
 
-             else if List.length m.guesses == maxGuesses then
-                "Unsuccessful! The answer is " ++ m.answer
+                 else if List.length m.guesses == maxGuesses then
+                    "Unsuccessful! The answer is " ++ m.answer
 
-             else
-                ""
-            )
+                 else
+                    ""
+                )
+            ]
         , viewTried m.currentGuess m.tried
         ]
 
@@ -303,10 +305,19 @@ viewTried currentGuess ws =
             (\t ->
                 case t of
                     Tried True c ->
-                        Html.button [ Attrs.disabled True, Attrs.class "strikethrough disabled" ] [ Html.text (String.fromChar c) ]
+                        Html.button
+                            [ Attrs.disabled (String.length currentGuess == 5)
+                            , Attrs.class "disabled"
+                            , onClick (TypeLetter (currentGuess ++ String.fromChar c))
+                            ]
+                            [ Html.text (String.fromChar c) ]
 
                     Tried False c ->
-                        Html.button [ onClick (TypeLetter (currentGuess ++ String.fromChar c)) ] [ Html.text (String.fromChar c) ]
+                        Html.button
+                            [ Attrs.disabled (String.length currentGuess == 5)
+                            , onClick (TypeLetter (currentGuess ++ String.fromChar c))
+                            ]
+                            [ Html.text (String.fromChar c) ]
             )
             ws
             ++ [ Html.button
