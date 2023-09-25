@@ -239,7 +239,8 @@ body m =
                 List.range 0 (maxGuesses - 1)
     in
     [ Html.div [ Attrs.class "wrapper" ]
-        [ Html.text
+        [ Html.div [ Attrs.class "guesses" ] attempts
+        , Html.text
             (if List.member m.answer m.guesses then
                 "Success!! The answer is " ++ m.answer
 
@@ -249,7 +250,6 @@ body m =
              else
                 ""
             )
-        , Html.div [ Attrs.class "guesses" ] attempts
         , viewTried m.currentGuess m.tried
         ]
 
@@ -259,10 +259,6 @@ body m =
 
 attempt : String -> Html Msg
 attempt currentGuess =
-    let
-        currentGuessAndBlanks =
-            String.toList currentGuess ++ List.repeat (5 - String.length currentGuess) '_'
-    in
     Html.div [ Attrs.class "attempt" ]
         [ Html.input
             [ Attrs.autofocus True
@@ -271,14 +267,6 @@ attempt currentGuess =
             , Attrs.onInput TypeLetter
             ]
             []
-        , Html.div
-            []
-            (List.map
-                (\c ->
-                    Html.span [ Attrs.class "letter" ] [ Html.text (String.fromChar c) ]
-                )
-                currentGuessAndBlanks
-            )
         ]
 
 

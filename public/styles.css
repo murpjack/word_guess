@@ -6,36 +6,50 @@
 }
 
 .guesses {
-  padding-top: 5em;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 1em;
+  max-width: 22em;
 }
 
-.guess,
+.guess {
+  column-gap: 4%;
+  display: inline-flex;
+  justify-content: space-between;
+  margin: 0;
+  width: 100%;
+}
+
 .attempt {
-  display: inline-block;
-  margin-bottom: 4em;
+  display: block;
+  width: 100%;
+  margin: 0;
 }
 
-span.letter {
-  padding: 1em 1.2em;
-  background-color: #eee;
-  border: 0.4em solid #fff;
+span.letter,
+span.empty {
+  padding: 1em 0;
+  background-color: #fff;
+  border: 0.2em solid #eee;
   border-radius: 100%;
   box-sizing: border-box;
-  margin: 1em 0.4em;
+  margin: 0;
+  line-height: 1em;
+  width: 16%;
 }
 
 .attempt > input {
-  width: 291px;
-  margin-left: 45px;
-}
-
-.guess > span.empty {
-  padding: 1em 1.2em;
-  background-color: #fff;
-  border: 0.4em solid #eee;
-  border-radius: 100%;
+  padding: 0.84em 2.2em;
+  background-color: #eee;
+  border: none;
+  border-radius: 2em;
   box-sizing: border-box;
-  margin: 1em 0.4em;
+  margin: 0;
+  width: 100%;
+  font-size: 1.2em;
+  letter-spacing: 0.24em;
+  text-align: center;
 }
 
 .tried {
@@ -53,7 +67,7 @@ span.letter {
   box-sizing: border-box;
   cursor: pointer;
   width: 9%;
-  height: 2.4em;
+  height: 3.2em;
   display: inline-flex;
   justify-content: center;
   align-items: center;
