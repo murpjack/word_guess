@@ -233,12 +233,12 @@ body m =
 
                             else
                                 Html.div [ Attrs.class "guess" ]
-                                    (List.repeat 5 (Html.span [ Attrs.class "empty" ] [ Html.text "_" ]))
+                                    (List.repeat 5 (Html.span [ Attrs.class "empty" ] [ Html.text "" ]))
                 )
             <|
                 List.range 0 (maxGuesses - 1)
     in
-    [ Html.div [ Attrs.class "wrapper" ]
+    [ Html.div [ Attrs.class "wrapper container" ]
         [ Html.div [ Attrs.class "guesses" ] attempts
         , Html.div [ Attrs.class "messages" ]
             [ Html.text

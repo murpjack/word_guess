@@ -5,12 +5,20 @@
   text-align: center;
 }
 
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .guesses {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
   row-gap: 1em;
+  margin-top: 2em;
   max-width: 20em;
+  width: 100%;
 }
 
 .guess {
@@ -30,12 +38,12 @@
 span.letter,
 span.empty {
   padding: 1em 0;
-  background-color: #fff;
-  border: 0.2em solid #eee;
+  background-color: #efefef;
   border-radius: 100%;
   box-sizing: border-box;
   margin: 0;
   line-height: 1em;
+  min-height: 3em;
   width: 16%;
 }
 
@@ -54,7 +62,7 @@ span.empty {
 
 .messages {
   padding: 0.5em;
-  margin: 2em auto 0;
+  margin-top: 2em;
   display: block;
   border-radius: 5em;
   min-height: 20px;
