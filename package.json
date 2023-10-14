@@ -2,7 +2,7 @@
   "license": "MIT",
   "main": "dist/index.html",
   "scripts": {
-    "mkdist": "rm -rf dist/ | mkdir dist && cp public/index.html dist/ | cp public/styles.css dist/",
+    "mkdist": "rm -rf dist/ | mkdir -p dist && cp public/index.html dist/ | cp public/styles.css dist/",
     "start": "yarn mkdist && elm-live src/Main.elm --dir=./dist --hot --start-page=dist/index.html -- --output=dist/app.js --debug",
     "build:dev": "yarn mkdist && elm make src/Main.elm --debug --output=dist/app.js",
     "build:prod": "yarn mkdist && elm make src/Main.elm --optimize --output=dist/app.js"
