@@ -3,3 +3,6 @@ yarn.lock
 elm-stuff
 
 dist/
+
+tf/.terraform/
+tf/*.tfstate*
