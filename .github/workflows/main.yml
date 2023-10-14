@@ -1,4 +1,4 @@
-name: Octo Organization CI
+name: Build & deploy
 
 on: workflow_dispatch
 
@@ -9,5 +9,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run a one-line script
-        run: echo Hello from Octo Organization
+      - name: Build
+        run: yarn build:prod
