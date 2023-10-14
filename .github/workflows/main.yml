@@ -31,22 +31,22 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
-        working_directory: ./tf
+        working-directory: ./tf
         run: terraform fmt -check
         continue-on-error: true
 
       - name: Terraform Init
         id: init
-        working_directory: ./tf
+        working-directory: ./tf
         run: terraform init
 
       - name: Terraform Validate
         id: validate
-        working_directory: ./tf
+        working-directory: ./tf
         run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
-        working_directory: ./tf
+        working-directory: ./tf
         run: terraform plan -no-color
         continue-on-error: true
