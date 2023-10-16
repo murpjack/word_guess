@@ -11,8 +11,8 @@ provider "aws" {
   region = var.region
 }
 
-resource "aws_security_group" "allow_tls" {
-  description = "Allow TLS inbound traffic"
+resource "aws_security_group" "allow_ssh" {
+  description = "Allow SSH inbound traffic"
   vpc_id      = var.vpc
 
   ingress {
@@ -20,8 +20,19 @@ resource "aws_security_group" "allow_tls" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["86.134.202.30/32"]
+    # TODO: Update this in console
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "allow_ssh"
+  }
+}
+
+
+resource "aws_security_group" "allow_tls" {
+  description = "Allow TLS inbound/outbound traffic"
+  vpc_id      = var.vpc
 
   ingress {
     description = "TLS from VPC"
@@ -57,7 +68,8 @@ resource "aws_instance" "ec2" {
   associate_public_ip_address = var.should_use_public_ip
 
   vpc_security_group_ids = [
-    aws_security_group.allow_tls.id,
+    aws_security_group.allow_ssh.id,
+    aws_security_group.allow_tls.id
   ]
 
   user_data = file("ec2-user-data.sh")
