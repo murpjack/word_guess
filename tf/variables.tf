@@ -1,7 +1,7 @@
 variable "ami" {
   type        = string
   description = "Amazon Machine Instance - Amazon Linux 2023 AMI (64-bit (x86))"
-  default     = "ami-0b25f6ba2f4419235"
+  default     = "ami-030594f92006445fd"
 }
 
 variable "region" {
