@@ -8,7 +8,7 @@ terraform {
   backend "s3" {
     bucket = "infra-1"
     key    = "network/terraform.tfstate"
-    region = var.region
+    region = "eu-west-2"
   }
 }
 
