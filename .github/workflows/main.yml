@@ -21,12 +21,29 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build
+        id: build_app
         run: yarn build:prod
+
+      - name: Zip
+        id: zip
+        needs: [build_app]
+        run: zip -r dist_dir.zip dist/
 
       - uses: actions/upload-artifact@v3
         with:
           name: dist_dir
-          path: dist/
+          path: dist_dir.zip
+
+      - name: S3 uploader
+        needs: [zip]
+        uses: a-sync/s3-uploader@2.0.1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          S3_KEY: ${{ secrets.S3_KEY }}
+          FILE: dist_dir.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -43,8 +60,8 @@ jobs:
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::503337729512:role/gha_terraform_access
-          aws-region: eu-west-2
+          role-to-assume: ${{ secrets.TF_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - uses: actions/checkout@v4
 
@@ -76,7 +93,7 @@ jobs:
         id: plan
         run: terraform plan -no-color
         continue-on-error: true
-
       - name: Terraform Apply
+
         # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
