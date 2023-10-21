@@ -70,6 +70,7 @@ resource "aws_security_group" "allow_tls" {
 resource "aws_instance" "ec2" {
   ami                         = var.ami
   instance_type               = var.instance_type
+  iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = var.should_use_public_ip
 
   vpc_security_group_ids = [
