@@ -24,7 +24,8 @@ variable "instance_type" {
 variable "iam_instance_profile" {
   type        = string
   description = "iam to allow ec2 s3 access"
-  default     = "arn:aws:iam::503337729512:role/allow_ec2_s3_full_access"
+  default     = "allow_ec2_s3_full_access"
+  # default     = "arn:aws:iam::503337729512:role/allow_ec2_s3_full_access"
 }
 
 variable "should_use_public_ip" {
