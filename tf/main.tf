@@ -25,8 +25,7 @@ resource "aws_security_group" "allow_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    # TODO: Update this in console
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = []
   }
 
   tags = {
@@ -93,7 +92,10 @@ resource "aws_instance" "ec2" {
     OS          = "Amazon Linux 2023"
   }
 
-  depends_on = [aws_security_group.allow_tls]
+  depends_on = [
+    aws_security_group.allow_ssh,
+    aws_security_group.allow_tls
+  ]
 }
 
 
