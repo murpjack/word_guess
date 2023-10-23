@@ -104,6 +104,6 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Apply
-
-        # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          args: '-var-file="dev.tfvars"'
         run: terraform apply -auto-approve -input=false
