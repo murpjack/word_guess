@@ -65,9 +65,6 @@ jobs:
         with:
           name: dist_dir
 
-      - name: Display structure of downloaded files
-        run: ls -R
-
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
@@ -97,9 +94,15 @@ jobs:
           aws_region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Plan
+        env:
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
         id: plan
         run: terraform plan -no-color -var-file="../dev.tfvars"
         continue-on-error: true
 
       - name: Terraform Apply
+        env:
+          GODADDY_API_KEY: ${{ secrets.GODADDY_API_KEY }}
+          GODADDY_API_SECRET: ${{ secrets.GODADDY_API_SECRET }}
         run: terraform apply -auto-approve -input=false -var-file="../dev.tfvars"
