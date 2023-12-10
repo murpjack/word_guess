@@ -35,7 +35,7 @@ resource "godaddy_domain_record" "app_domain" {
 
   record {
     type = "CNAME"
-    name = "app"
+    name = "www"
     data = var.domain_name
     ttl  = var.time_to_live
   }
