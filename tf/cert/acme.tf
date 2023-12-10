@@ -26,6 +26,6 @@ resource "acme_certificate" "certificate" {
   subject_alternative_names = [var.domain_name]
 
   dns_challenge {
-    provider = "route53"
+    provider = "godaddy"
   }
 }
