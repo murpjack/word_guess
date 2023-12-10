@@ -22,3 +22,9 @@ module "domain" {
   name_server_1 = var.name_server_1
   name_server_2 = var.name_server_2
 }
+
+module "cert" {
+  source             = "./cert"
+  domain_name        = var.domain_name
+  registration_email = var.registration_email
+}

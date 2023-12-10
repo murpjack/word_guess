@@ -34,3 +34,7 @@ variable "name_server_1" {
 variable "name_server_2" {
   description = "Where your domain is stored"
 }
+
+variable "registration_email" {
+  description = "Email used to verify domain ownership"
+}
