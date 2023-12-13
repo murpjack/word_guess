@@ -16,11 +16,9 @@ module "app" {
 }
 
 module "domain" {
-  source        = "./domain"
-  domain_name   = var.domain_name
-  ipv4          = module.app.ec2_instance
-  name_server_1 = var.name_server_1
-  name_server_2 = var.name_server_2
+  source      = "./domain"
+  domain_name = var.domain_name
+  ipv4        = module.app.ec2_instance
 }
 
 module "cert" {

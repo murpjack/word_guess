@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "acme" {
-  server_url = "https://acme-v02.api.letsencrypt.org/directory"
+  server_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
 
 resource "tls_private_key" "private_key" {
@@ -23,9 +23,9 @@ resource "acme_registration" "reg" {
 resource "acme_certificate" "certificate" {
   account_key_pem           = acme_registration.reg.account_key_pem
   common_name               = "www.${var.domain_name}"
-  subject_alternative_names = [var.domain_name]
+  subject_alternative_names = ["*.${var.domain_name}"]
 
   dns_challenge {
-    provider = "godaddy"
+    provider = "digitalocean"
   }
 }

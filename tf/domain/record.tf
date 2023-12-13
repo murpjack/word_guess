@@ -1,55 +1,55 @@
 terraform {
   required_providers {
-    godaddy = {
-      source  = "n3integration/godaddy"
-      version = "1.9.1"
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "2.32.0"
     }
   }
 }
 
-resource "godaddy_domain_record" "app_domain" {
-  domain = var.domain_name
+resource "digitalocean_domain" "default" {
+  name = var.domain_name
+}
 
-  record {
-    type = "A"
-    name = "@"
-    data = var.ipv4
-    ttl  = var.time_to_live
-  }
+# Add an A record to the domain for www.example.com.
+resource "digitalocean_record" "ipv4" {
+  domain = digitalocean_domain.default.id
+  type   = "A"
+  name   = "@"
+  value  = var.ipv4
+}
 
-  record {
-    type     = "NS"
-    name     = "@"
-    data     = var.name_server_1
-    ttl      = var.time_to_live
-    priority = 10
-  }
+resource "digitalocean_record" "www" {
+  domain = digitalocean_domain.default.id
+  type   = "CNAME"
+  name   = "www"
+  value  = var.ipv4
+}
 
-  record {
-    type     = "NS"
-    name     = "@"
-    data     = var.name_server_2
-    ttl      = var.time_to_live
-    priority = 10
-  }
+# Add a MX record for the example.com domain itself.
+resource "digitalocean_record" "ns1" {
+  domain   = digitalocean_domain.default.id
+  type     = "NS"
+  name     = "@"
+  priority = 10
+  value    = "ns1.digitalocean.com"
+}
 
-  record {
-    type = "CNAME"
-    name = "www"
-    data = var.domain_name
-    ttl  = var.time_to_live
-  }
+# Add a MX record for the example.com domain itself.
+resource "digitalocean_record" "ns2" {
+  domain   = digitalocean_domain.default.id
+  type     = "NS"
+  name     = "@"
+  priority = 10
+  value    = "ns2.digitalocean.com"
+}
 
-  record {
-    type = "CNAME"
-    name = "_domainconnect"
-    data = "_domainconnect.gd.domaincontrol.com"
-  }
-
-  record {
-    type = "SOA"
-    name = "@"
-    data = "Primary nameserver: ns33.domaincontrol.com"
-  }
+# Add a MX record for the example.com domain itself.
+resource "digitalocean_record" "ns3" {
+  domain   = digitalocean_domain.default.id
+  type     = "NS"
+  name     = "@"
+  priority = 10
+  value    = "ns3.digitalocean.com"
 }
 
