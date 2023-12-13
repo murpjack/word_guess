@@ -23,7 +23,7 @@ resource "digitalocean_record" "www" {
   domain = digitalocean_domain.default.id
   type   = "CNAME"
   name   = "www"
-  value  = var.domain_name
+  value  = "${var.domain_name}."
 }
 
 # Add a MX record for the example.com domain itself.
