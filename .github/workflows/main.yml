@@ -98,6 +98,7 @@ jobs:
       - name: Terraform Plan
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
         id: plan
         run: terraform plan -no-color -var-file="../dev.tfvars"
         continue-on-error: true
@@ -105,4 +106,5 @@ jobs:
       - name: Terraform Apply
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
         run: terraform apply -auto-approve -input=false -var-file="../dev.tfvars"

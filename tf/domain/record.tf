@@ -23,7 +23,7 @@ resource "digitalocean_record" "www" {
   domain = digitalocean_domain.default.id
   type   = "CNAME"
   name   = "www"
-  value  = var.ipv4
+  value  = var.domain_name
 }
 
 # Add a MX record for the example.com domain itself.
@@ -32,7 +32,7 @@ resource "digitalocean_record" "ns1" {
   type     = "NS"
   name     = "@"
   priority = 10
-  value    = "ns1.digitalocean.com"
+  value    = "ns1.digitalocean.com."
 }
 
 # Add a MX record for the example.com domain itself.
@@ -41,7 +41,7 @@ resource "digitalocean_record" "ns2" {
   type     = "NS"
   name     = "@"
   priority = 10
-  value    = "ns2.digitalocean.com"
+  value    = "ns2.digitalocean.com."
 }
 
 # Add a MX record for the example.com domain itself.
@@ -50,6 +50,6 @@ resource "digitalocean_record" "ns3" {
   type     = "NS"
   name     = "@"
   priority = 10
-  value    = "ns3.digitalocean.com"
+  value    = "ns3.digitalocean.com."
 }
 
