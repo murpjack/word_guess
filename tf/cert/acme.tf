@@ -27,5 +27,10 @@ resource "acme_certificate" "certificate" {
 
   dns_challenge {
     provider = "digitalocean"
+
+    config = {
+      DO_HTTP_TIMEOUT = 600
+      DO_TTL          = 600
+    }
   }
 }
