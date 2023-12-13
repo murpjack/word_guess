@@ -27,14 +27,6 @@ variable "domain_name" {
   type = string
 }
 
-variable "name_server_1" {
-  description = "Where your domain is stored"
-}
-
-variable "name_server_2" {
-  description = "Where your domain is stored"
-}
-
 variable "registration_email" {
   description = "Email used to verify domain ownership"
 }

@@ -16,12 +16,3 @@ variable "overwrite_existing" {
   description = "If one already exists then overwrite"
   default     = true
 }
-
-variable "name_server_1" {
-  description = "Where your domain is stored"
-}
-
-variable "name_server_2" {
-  description = "Where your domain is stored"
-}
-
