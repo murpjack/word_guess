@@ -4,6 +4,10 @@ on: workflow_dispatch
 
 jobs:
   build:
+    defaults:
+      run:
+        working-directory: ./app
+
     runs-on: ubuntu-latest
 
     steps:
