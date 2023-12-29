@@ -6,3 +6,5 @@ dist
 tf/.terraform*
 tf/*.tfstate*
 tf/*.tfvars
+
+.env
