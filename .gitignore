@@ -1,8 +1,7 @@
-node_modules/
-yarn.lock
+node_modules
 elm-stuff
 
-dist/
+dist
 
 tf/.terraform*
 tf/*.tfstate*
