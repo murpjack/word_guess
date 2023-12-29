@@ -1,3 +1,3 @@
 # WordGuess
 
-A Guess the word in 5 attempts
+Guess the word in 5 attempts
