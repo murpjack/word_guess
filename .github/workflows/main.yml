@@ -12,7 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
@@ -27,6 +26,7 @@ jobs:
       - name: Build
         run: yarn build:prod
 
+      # TODO: Build zip of game
       - name: Zip
         run: zip -r dist_dir.zip dist/
 
@@ -34,6 +34,10 @@ jobs:
         with:
           name: dist_dir
           path: dist_dir.zip
+
+      # TODO: Release zip -eg. gh release create {{version}} --title "{{version}}"
+      - name: GH release
+        run: gh release create v0.0.1 --title "v0.0.1 (test)"
 
       - name: S3 uploader
         uses: a-sync/s3-uploader@2.0.1
@@ -44,71 +48,79 @@ jobs:
           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           S3_KEY: ${{ secrets.S3_KEY }}
           FILE: dist_dir.zip
-
-  deploy_prod:
-    name: Deploy to production
-    environment: production
-    runs-on: ubuntu-latest
-    needs: build
-    defaults:
-      run:
-        working-directory: ./tf
-
-    permissions:
-      id-token: write # This is required for requesting the JWT
-      contents: read # This is required for actions/checkout
-
-    steps:
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.TF_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist_dir
-
-      - uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
-
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Download env vars
-        id: tfvars
-        uses: keithweaver/aws-s3-github-action@v1.0.0
-        with:
-          command: cp
-          source: "s3://${{ secrets.AWS_S3_BUCKET }}/network/dev.tfvars"
-          destination: dev.tfvars
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
-
-      - name: Terraform Plan
-        env:
-          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
-        id: plan
-        run: terraform plan -no-color -var-file="../dev.tfvars"
-        continue-on-error: true
-
-      - name: Terraform Apply
-        env:
-          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
-        run: terraform apply -auto-approve -input=false -var-file="../dev.tfvars"
+#   deploy_prod:
+#     name: Deploy to production
+#     environment: production
+#     runs-on: ubuntu-latest
+#     needs: build
+#     defaults:
+#       run:
+#         working-directory: ./tf
+#
+#     permissions:
+#       id-token: write # This is required for requesting the JWT
+#       contents: read # This is required for actions/checkout
+#
+#     steps:
+#       - name: Configure aws credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           role-to-assume: ${{ secrets.TF_ROLE }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+#
+#       - uses: actions/checkout@v4
+#
+#       - uses: actions/download-artifact@v3
+#         with:
+#           name: dist_dir
+#
+#       - uses: hashicorp/setup-terraform@v2
+#         with:
+#           terraform_wrapper: false
+#
+#       # TODO: fmt should be run as a commit hook and not in the pipeline
+#       - name: Terraform fmt
+#         id: fmt
+#         run: terraform fmt -check
+#         continue-on-error: true
+#
+#       - name: Terraform Init
+#         id: init
+#         run: terraform init
+#
+#       # TODO: validate should be run as a commit hook and not in the pipeline
+#       - name: Terraform Validate
+#         id: validate
+#         run: terraform validate -no-color
+#
+#       - name: Download env vars
+#         id: tfvars
+#         uses: keithweaver/aws-s3-github-action@v1.0.0
+#         with:
+#           command: cp
+#           source: "s3://${{ secrets.AWS_S3_BUCKET }}/network/dev.tfvars"
+#           destination: dev.tfvars
+#           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws_region: ${{ secrets.AWS_REGION }}
+#
+#       - name: Terraform Plan
+#         env:
+#           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+#           DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
+#         id: plan
+#         run: terraform plan -no-color -var-file="../dev.tfvars"
+#         continue-on-error: true
+#
+#       - name: Terraform Apply
+#         env:
+#           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+#           DO_AUTH_TOKEN: ${{ secrets.DO_AUTH_TOKEN }}
+#         run: terraform apply -auto-approve -input=false -var-file="../dev.tfvars"
+#
+#   # TODO: Temporary, delete release
+#   cleanup:
+#     name: Cleanup releases while testing
+#     environment: production
+#     runs-on: ubuntu-latest
+#     needs: build
