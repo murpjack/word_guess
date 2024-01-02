@@ -35,7 +35,7 @@ jobs:
           name: dist_dir
           path: dist_dir.zip
 
-      # TODO: Release zip -eg. gh release create {{version}} --title "{{version}}"
+      # TODO: Release zip eg. gh release create {{version}} --title "{{version}}"
       - name: GH release
         run: gh release create v0.0.1 --title "v0.0.1 (test)"
         env:
