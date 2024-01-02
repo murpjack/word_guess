@@ -26,7 +26,6 @@ jobs:
       - name: Build
         run: yarn build:prod
 
-      # TODO: Build zip of game
       - name: Zip
         run: zip -r dist_dir.zip dist/
 
@@ -37,7 +36,7 @@ jobs:
 
       # TODO: Release zip eg. gh release create {{version}} --title "{{version}}"
       - name: GH release
-        run: gh release create v0.0.1 --title "v0.0.1 (test)"
+        run: gh release create v0.0.2 --title "v0.0.2 (test)" dist_dir.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
