@@ -39,7 +39,7 @@ jobs:
       - name: GH release
         run: gh release create v0.0.1 --title "v0.0.1 (test)"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: S3 uploader
         uses: a-sync/s3-uploader@2.0.1
