@@ -3,10 +3,8 @@
 
 echo "Retrieving latest tag."
 git fetch -a
-tag_name=$(git describe --tags)
+tag_name=$(git describe --tags `git rev-list --tags --max-count=1` || exit)
 
-latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-echo "latest tag = $latest_tag"
 
 echo "Retrieving possible release for tag $tag_name."
 if [ $(gh release view "$tag_name") ]; then
