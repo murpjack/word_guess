@@ -1,1 +1,4 @@
-* export-ignore
+tf/* export-ignore
+.gitattributes export-ignore
+.gitignore export-ingore
+.github/* export-ignore
