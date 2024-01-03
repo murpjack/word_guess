@@ -37,8 +37,8 @@ jobs:
       # TODO: Update this step once happy with release asset
       - name: Release
         run: |
-          chmod +x utils/make_release.sh
-          sh utils/make_release.sh dist_dir.zip
+          chmod +x ./utils/make_release.sh
+          ./utils/make_release.sh dist_dir.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 #     - name: S3 uploader
