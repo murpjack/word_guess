@@ -36,9 +36,7 @@ jobs:
 
       # TODO: Update this step once happy with release asset
       - name: Release
-        defaults:
-          run:
-            working-directory: ./utils
+        working-directory: ./utils
         run: ./make_release.sh dist_dir.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
