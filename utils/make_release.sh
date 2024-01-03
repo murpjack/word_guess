@@ -3,7 +3,7 @@
 
 echo "Retrieving latest tag."
 git fetch -a
-tag_name=$(git describe --tags `git rev-list --tags --max-count=1` || exit)
+tag_name=$(git describe --tags || exit)
 
 
 echo "Retrieving possible release for tag $tag_name."
