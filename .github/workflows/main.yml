@@ -34,21 +34,24 @@ jobs:
           name: dist_dir
           path: dist_dir.zip
 
-      # TODO: Release zip eg. gh release create {{version}} --title "{{version}}"
+      # TODO: Update this step once happy with release asset
       - name: GH release
-        run: gh release create v0.0.2 --title "v0.0.2 (test)" dist_dir.zip
+        run: |
+          gh release delete v0.0.1 --yes
+          gh release create v0.0.1 --title "v0.0.1" dist_dir.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: S3 uploader
-        uses: a-sync/s3-uploader@2.0.1
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          S3_KEY: ${{ secrets.S3_KEY }}
-          FILE: dist_dir.zip
+#     - name: S3 uploader
+#         uses: a-sync/s3-uploader@2.0.1
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_REGION: ${{ secrets.AWS_REGION }}
+#           S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+#           S3_KEY: ${{ secrets.S3_KEY }}
+#           FILE: dist_dir.zip
+#
+#
 #   deploy_prod:
 #     name: Deploy to production
 #     environment: production
