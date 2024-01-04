@@ -1,6 +1,7 @@
 name: Build & deploy
 
-on: workflow_dispatch
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -40,11 +41,13 @@ jobs:
 
       # TODO: Update this step once happy with release asset
       - name: Release
-        working-directory: ./utils
-        run: gh release create ${{github.ref_name}} --title ${{github.ref_name}} dist_dir.zip
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          # (Optional) Path to changelog.
+          changelog: CHANGELOG.md
+          # (Required) GitHub token for creating GitHub Releases.
+          token: ${{ secrets.GITHUB_TOKEN }}
+#
 #     - name: S3 uploader
 #         uses: a-sync/s3-uploader@2.0.1
 #         env:
